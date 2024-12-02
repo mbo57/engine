@@ -69,6 +69,29 @@ func (h *IndexHandler) GetIndexInfo(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{"docs": indexDocs, "map": indexMap})
 }
 
+func (h *IndexHandler) GetDoc(c echo.Context) error {
+	indexName := c.Param("IndexName")
+	docID := c.Param("DocID")
+	doc, err := h.usecase.GetDoc(indexName, docID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	if doc == nil {
+		return c.JSON(http.StatusNotFound, map[string]string{"error": "doc not found"})
+	}
+	return c.JSON(http.StatusOK, map[string]interface{}{"doc": doc})
+}
+
+func (h *IndexHandler) DeleteDoc(c echo.Context) error {
+	indexName := c.Param("IndexName")
+	docID := c.Param("DocID")
+	err := h.usecase.DeleteDoc(indexName, docID)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": err.Error()})
+	}
+	return c.JSON(http.StatusOK, map[string]string{"message": "doc deleted"})
+}
+
 func (h *IndexHandler) SearchIndex(c echo.Context) error {
 	indexName := c.Param("IndexName")
 	query := make(map[string]interface{})

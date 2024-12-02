@@ -8,14 +8,14 @@ import (
 	"app/util/logger"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
+	// "github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
 	logger := logger.New()
 	e := echo.New()
 	// e.Use(middleware.Logger())
-	e.Use(middleware.Recover())
+	// e.Use(middleware.Recover())
 	h := handler.NewIndexHandler(
 		logger,
 		usecase.NewIndexUsecase(

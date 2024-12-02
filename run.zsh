@@ -6,3 +6,4 @@ curl -X POST http://localhost:1323/test/_doc -d '{"text": "I play games"}'
 curl -X POST http://localhost:1323/test/_doc -d '{"text": "I play games and read books"}'
 curl -X POST http://localhost:1323/test/_doc -d '{"text": "I like to cook"}'
 curl -X GET http://localhost:1323/test/_search -d '{"text": "read books"}'
+curl -X POST http://localhost:1323/test/_commit

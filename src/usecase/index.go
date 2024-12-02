@@ -5,9 +5,11 @@ import (
 	"app/domain/repository"
 	"app/util"
 	"app/util/logger"
+	"app/util/pserror"
 	"errors"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -34,6 +36,8 @@ type IndexUsecase interface {
 	CreateIndex(indexName string) error
 	DeleteIndex(indexName string) error
 	IndexAddDoc(indexName string, doc map[string]interface{}) error
+	GetDoc(indexName string, docID string) (*model.Doc, error)
+	DeleteDoc(indexName string, docID string) error
 	GetIndexInfo(indexName string) ([]model.Doc, map[string]map[uint32][]uint32, error)
 	SearchIndex(indexName string, query map[string]interface{}) ([]result, error)
 	CommitIndex(indexName string) error
@@ -63,6 +67,8 @@ func (i *indexUsecase) CreateIndex(indexName string) error {
 		Docs:     []model.Doc{},
 		Map:      map[string]map[uint32][]uint32{},
 		Analyzer: DefaultAnalyzer(DefualtStopWords, DefualtDeleteCharacter),
+		DocCount: 0,
+		TextSize: 2048,
 	}
 	i.indices[indexName] = &index
 	return nil
@@ -91,9 +97,9 @@ func (i *indexUsecase) IndexAddDoc(
 		return errors.New("text not found")
 	}
 
-	fmt.Println("docCount")
 	docCount, err := i.indexRepo.GetIndexDocCount(index.Name)
 	if err != nil {
+		i.logger.Error(err.Error())
 		return err
 	}
 	if index.DocCount == 0 {
@@ -102,8 +108,13 @@ func (i *indexUsecase) IndexAddDoc(
 
 	index.DocCount++
 	id := index.DocCount - 1
+	fmt.Println("new doc id", id)
 	doc := model.NewDoc(id, inputText)
 	index.Docs = append(index.Docs, doc)
+	byteLen := len([]byte(inputText))
+	if uint32(byteLen) > index.TextSize {
+		index.TextSize = uint32(byteLen)
+	}
 	words := index.Analyzer(inputText)
 	for i, word := range words {
 		if _, ok := index.Map[word]; !ok {
@@ -125,6 +136,65 @@ func (i *indexUsecase) GetIndexInfo(indexName string) ([]model.Doc, map[string]m
 		return []model.Doc{}, nil, errors.New("index not found")
 	}
 	return index.Docs, index.Map, nil
+}
+
+func (i *indexUsecase) GetDoc(
+	indexName string,
+	docID string,
+) (*model.Doc, error) {
+	i.logger.Debug("GetDoc")
+	tmpID, err := strconv.ParseInt(docID, 10, 32)
+	if err != nil {
+		return nil, err
+	}
+	id := uint32(tmpID)
+	index, okMemory := i.indices[indexName]
+	if okMemory {
+		// TODO: 高速化
+		// Docsの構造を変える
+		for _, doc := range index.Docs {
+			if doc.Id == id {
+				return &doc, nil
+			}
+		}
+	}
+	docs, err := i.indexRepo.GetDocs(indexName, []uint32{id})
+	if err != nil {
+		return nil, err
+	}
+	if len(docs) == 0 {
+		return nil, pserror.NotFoundDoc
+	}
+	return &docs[0], nil
+}
+
+func (i *indexUsecase) DeleteDoc(
+	indexName string,
+	docID string,
+) error {
+	i.logger.Debug("DeleteDoc")
+	tmpID, err := strconv.ParseInt(docID, 10, 32)
+	if err != nil {
+		return err
+	}
+	id := uint32(tmpID)
+	index, okMemory := i.indices[indexName]
+	if okMemory {
+		// TODO: 高速化
+		// Docsの構造を変える
+		for _, doc := range index.Docs {
+			if doc.Id == id {
+				doc.Deleted = true
+				return nil
+			}
+		}
+	}
+
+	_, err = i.indexRepo.DeleteDocs(indexName, []uint32{id})
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (i *indexUsecase) SearchIndex(
@@ -212,8 +282,10 @@ func (i *indexUsecase) CommitIndex(indexName string) error {
 	}
 	err := i.indexRepo.IndexWriter(index)
 	if err != nil {
+		i.logger.Error(err.Error())
 		return err
 	}
+	delete(i.indices, indexName)
 	return nil
 
 }
