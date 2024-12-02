@@ -1,0 +1,22 @@
+{
+  "candidates": [
+    {
+      "content": {
+        "parts": [
+          {
+            "text": "The quick brown fox jumps over the lazy dog.\nShe reads a book every night.\nHe plays soccer with his friends.\nThe sun shines brightly today.\nBirds sing sweetly in the morning.\nMy cat sleeps on the sofa.\nWe eat dinner at seven o'clock.\nThey go to school by bus.\nI love to eat ice cream.\nHe works hard every day.\nThe flowers bloom in spring.\nShe writes beautiful poems.\nWe travel to Europe next year.\nThey play music loudly.\nI drink coffee in the morning.\nHe drives a red car.\nShe sings beautifully in the choir.\nWe swim in the ocean every summer.\nThey build houses for a living.\nI study English every day.\nHe likes to eat pizza.\nShe dances gracefully on stage.\nWe watch movies on weekends.\nThey hike in the mountains.\nI listen to music before bed.\nHe paints beautiful pictures.\nShe cooks delicious food.\nWe play games with our children.\nThey travel the world extensively.\nI read the newspaper daily.\nHe writes emails to his clients.\nShe teaches mathematics to students.\nWe attend church every Sunday.\nThey volunteer at the hospital.\nI enjoy spending time with my family.\nHe fixes cars in his garage.\nShe works as a nurse.\nWe go shopping on Saturdays.\nThey celebrate holidays with joy.\nI learn a new language every year.\nHe plays the guitar very well.\nShe draws amazing landscapes.\nWe build sandcastles at the beach.\nThey watch the sunset together.\nI dream of traveling to Japan.\nHe speaks fluent Spanish.\nShe makes beautiful jewelry.\nWe grow vegetables in our garden.\nThey enjoy camping in the woods.\nI write short stories in my free time.\nHe fixes computers for a living.\n"
+          }
+        ],
+        "role": "model"
+      },
+      "finishReason": "STOP",
+      "avgLogprobs": -0.3454522201695393
+    }
+  ],
+  "usageMetadata": {
+    "promptTokenCount": 33,
+    "candidatesTokenCount": 388,
+    "totalTokenCount": 421
+  },
+  "modelVersion": "gemini-1.5-flash-latest"
+}
