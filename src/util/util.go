@@ -12,101 +12,57 @@ func FindUniqueElemens(arr []uint32) []uint32 {
 	return result
 }
 
-func FindCommonElements(a [][]uint32) []uint32 {
-	result := []uint32{}
-	index := make([]uint32, len(a))
+func FindCommonElements(a [][]int) []int {
+	result := []int{}
+	index := make([]int, len(a))
+	maxNum := a[0][index[0]]
+	i := 0
+	sameCnt := 1
+loop:
 	for {
-		isEnd := false
-		checkIndexList := []uint32{}
-		for i := 0; i < len(a); i++ {
-			if len(a[i]) == 0 {
-				return []uint32{}
-			}
-			checkIndexList = append(checkIndexList, a[i][index[i]])
-		}
-		isEqual := allElementsEqual(checkIndexList)
-		if !isEqual {
-			maxNum, _ := maxElementWithIndex(checkIndexList)
-			for i := 0; i < len(index); i++ {
-				index[i] = binarySearch(a[i], maxNum)
-				checkIndexList[i] = a[i][index[i]]
-			}
-
-			if allElementsEqual(checkIndexList) {
-				isEqual = true
-			} else {
-				_, minNumIndex := minElementWithIndex(checkIndexList)
-				index[minNumIndex]++
-				if index[minNumIndex] >= uint32(len(a[minNumIndex])) {
-					isEnd = true
+		tmp, ok := binarySearch(a[i][index[i]:], maxNum)
+		if ok {
+			index[i] = tmp + index[i]
+			sameCnt++
+			if sameCnt == len(index) {
+				result = append(result, a[i][index[i]])
+				for j := 0; j < len(index); j++ {
+					index[j]++
+					if index[j] >= len(a[j]) {
+						break loop
+					}
+					if a[j][index[j]] > maxNum {
+						maxNum = a[j][index[j]]
+					}
 				}
+				sameCnt = 1
 			}
-		}
-		if isEqual {
-			result = append(result, checkIndexList[0])
-			for i := 0; i < len(index); i++ {
-				index[i]++
-				if index[i] >= uint32(len(a[i])) {
-					isEnd = true
-				}
+		} else {
+			index[i] = tmp + index[i] + 1
+			if index[i] >= len(a[i]) {
+				break loop
 			}
+			if a[i][index[i]] > maxNum {
+				maxNum = a[i][index[i]]
+			}
+			sameCnt = 1
 		}
-		if isEnd {
-			break
-		}
+		i = (i + 1) % len(a)
 	}
 	return result
 }
 
-func maxElementWithIndex(arr []uint32) (uint32, uint32) {
-	max := arr[0]
-	index := 0
-	for i, v := range arr {
-		if v > max {
-			max = v
-			index = i
-		}
-	}
-	return max, uint32(index)
-}
-
-func minElementWithIndex(arr []uint32) (uint32, uint32) {
-	min := arr[0]
-	index := 0
-	for i, v := range arr {
-		if v < min {
-			min = v
-			index = i
-		}
-	}
-	return min, uint32(index)
-}
-
-func allElementsEqual[T comparable](arr []T) bool {
-	if len(arr) == 0 {
-		return true
-	}
-	first := arr[0]
-	for _, v := range arr {
-		if v != first {
-			return false
-		}
-	}
-	return true
-}
-
-func binarySearch(arr []uint32, target uint32) uint32 {
-	low := 0
-	high := len(arr) - 1
+func binarySearch(arr []int, target int) (int, bool) {
+	low, high := 0, len(arr)-1
 	for low <= high {
 		mid := (low + high) / 2
 		if arr[mid] == target {
-			return uint32(mid)
+			return mid, true
 		} else if arr[mid] < target {
 			low = mid + 1
 		} else {
 			high = mid - 1
 		}
 	}
-	return uint32(low)
+	return high, false
 }
