@@ -1,4 +1,7 @@
-./src/tmp/*
-./src/data/*
-./data/*
+src/tmp
+src/data
+data
 
+*.swp
+
+.env
