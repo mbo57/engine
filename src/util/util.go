@@ -12,9 +12,9 @@ func FindUniqueElemens(arr []uint32) []uint32 {
 	return result
 }
 
-func FindCommonElements(a [][]int) []int {
-	result := []int{}
-	index := make([]int, len(a))
+func FindCommonElements(a [][]uint32) []uint32 {
+	result := []uint32{}
+	index := make([]uint32, len(a))
 	maxNum := a[0][index[0]]
 	i := 0
 	sameCnt := 1
@@ -28,7 +28,7 @@ loop:
 				result = append(result, a[i][index[i]])
 				for j := 0; j < len(index); j++ {
 					index[j]++
-					if index[j] >= len(a[j]) {
+					if index[j] >= uint32(len(a[j])) {
 						break loop
 					}
 					if a[j][index[j]] > maxNum {
@@ -39,7 +39,7 @@ loop:
 			}
 		} else {
 			index[i] = tmp + index[i] + 1
-			if index[i] >= len(a[i]) {
+			if index[i] >= uint32(len(a[i])) {
 				break loop
 			}
 			if a[i][index[i]] > maxNum {
@@ -52,17 +52,17 @@ loop:
 	return result
 }
 
-func binarySearch(arr []int, target int) (int, bool) {
+func binarySearch(arr []uint32, target uint32) (uint32, bool) {
 	low, high := 0, len(arr)-1
 	for low <= high {
 		mid := (low + high) / 2
 		if arr[mid] == target {
-			return mid, true
+			return uint32(mid), true
 		} else if arr[mid] < target {
 			low = mid + 1
 		} else {
 			high = mid - 1
 		}
 	}
-	return high, false
+	return uint32(high), false
 }
